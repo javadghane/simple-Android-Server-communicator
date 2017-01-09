@@ -41,21 +41,25 @@ public class AsyncPostData extends AsyncTask<HashMap, Void, String> {
 
     @Override
     protected String doInBackground(HashMap... maps) {
-        OkHttpClient client = new OkHttpClient();
+         OkHttpClient client = new OkHttpClient();
 
-        FormEncodingBuilder form = new FormEncodingBuilder();
+        MultipartBody.Builder form = new MultipartBody.Builder();
+        form.setType(MultipartBody.FORM);
+
         Set set = maps[0].entrySet();
-        Iterator i = set.iterator();
-        while (i.hasNext()) {
-            Map.Entry me = (Map.Entry) i.next();
-            form.add(me.getKey().toString(), me.getValue().toString());
+        for (Object aSet : set) {
+            Map.Entry me = (Map.Entry) aSet;
+            form.addFormDataPart(me.getKey().toString(), me.getValue().toString());
         }
-        RequestBody formBody = form.build();
+
+        RequestBody requestBody = form.build();
 
         Request request = new Request.Builder()
                 .url(this.link)
-                .post(formBody)
+                .method("POST", RequestBody.create(null, new byte[0]))
+                .post(requestBody)
                 .build();
+
 
         try {
             Response response = client.newCall(request).execute();
